@@ -2,6 +2,8 @@ package com.jacksonemmerich.sbemailverificationdemo.user;
 
 import com.jacksonemmerich.sbemailverificationdemo.exception.UserAlreadyExistsException;
 import com.jacksonemmerich.sbemailverificationdemo.registration.RegistrationRequest;
+import com.jacksonemmerich.sbemailverificationdemo.registration.token.VerificationToken;
+import com.jacksonemmerich.sbemailverificationdemo.registration.token.VerificationTokenRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -16,6 +18,7 @@ public class UserService implements IUserService{
     //as classes AutoWired injetadas dessa forma devem ser do tipo final e usar @RequiredArgsConstructor do Lambok
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final VerificationTokenRepository tokenRepository;
 
     @Override
     public List<User> getUsers() {
@@ -41,4 +44,12 @@ public class UserService implements IUserService{
     public Optional<User> findByEmail(String email) {
         return Optional.empty();
     }
+
+    @Override
+    public void saveUserVerificationToken(User theUser, String token) {
+        var verificationToken = new VerificationToken(token, theUser);
+        tokenRepository.save(verificationToken);
+    }
+
+
 }
