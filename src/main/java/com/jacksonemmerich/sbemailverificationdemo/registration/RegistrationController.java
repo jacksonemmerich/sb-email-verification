@@ -20,9 +20,7 @@ public class RegistrationController {
     @PostMapping
     public String registerUser(RegistrationRequest registrationRequest, final HttpServletRequest request){
         User user = userService.registerUser(registrationRequest);
-        // publish registration event
         publisher.publishEvent(new RegistrationCompleteEvent(user,applicationUrl(request)));
-
         return "Sucess! Please, check your email for to complete your registration";
     }
 

@@ -24,7 +24,7 @@ public class VerificationToken {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	private String token;
-	private Date experationTime;
+	private Date expirationTime;
 	
 	private static final int EXPIRATION_TIME = 15;
 	
@@ -36,13 +36,13 @@ public class VerificationToken {
 		super();
 		this.token = token;
 		this.user = user;
-		this.experationTime = this.getTokenExpirationTime();
+		this.expirationTime = this.getTokenExpirationTime();
 	}
 	
 	public VerificationToken(String token) {
 		super();
 		this.token = token;
-		this.experationTime = this.getTokenExpirationTime();
+		this.expirationTime = this.getTokenExpirationTime();
 	}
 
 	public Date getTokenExpirationTime() {
