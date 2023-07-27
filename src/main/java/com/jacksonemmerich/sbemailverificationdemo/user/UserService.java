@@ -43,7 +43,7 @@ public class UserService implements IUserService{
 
     @Override
     public Optional<User> findByEmail(String email) {
-        return Optional.empty();
+        return userRepository.findByEmail(email);
     }
 
     @Override
