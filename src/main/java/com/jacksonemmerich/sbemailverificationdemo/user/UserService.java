@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -30,10 +31,10 @@ public class UserService implements IUserService{
     public User registerUser(RegistrationRequest request) {
         Optional<User> user = this.findByEmail(request.email());
         if (user.isPresent()){
-            throw new UserAlreadyExistsException("User with email "+ request.email() + "already exists");
+            throw new UserAlreadyExistsException("User with email "+ request.email() +" already exists");
         }
         var newUser = new User();
-        newUser.setFisrtName(request.fisrtName());
+        newUser.setFirstName(request.fisrtName());
         newUser.setLastName(request.lastName());
         newUser.setEmail(request.email());
         newUser.setPassword(passwordEncoder.encode(request.password()));
@@ -68,6 +69,15 @@ public class UserService implements IUserService{
         user.setEnabled(true);
         userRepository.save(user);
         return "valid";
+    }
+
+    @Override
+    public VerificationToken generateNewVerificationToken(String oldToken) {
+        VerificationToken verificationToken = tokenRepository.findByToken(oldToken);
+        var tokenExpirationTime = new VerificationToken();
+        verificationToken.setToken(UUID.randomUUID().toString());
+        verificationToken.setExpirationTime(tokenExpirationTime.getTokenExpirationTime());
+        return tokenRepository.save(verificationToken);
     }
 
 

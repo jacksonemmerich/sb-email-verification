@@ -8,5 +8,7 @@
 
 
 ### part 02 - Complete User Registration / Login Flow | Spring Boot 3 With Email Verification.| Spring security 6
-2:25:15
+28:11
 [![Complete User Registration / Login Flow | Spring Boot 3 With Email Verification](https://i.imgur.com/dq5TALy.png)](https://www.youtube.com/watch?v=_zbfs0_4dbE "Complete User Registration / Login Flow | Spring Boot 3 With Email Verification.| Spring security 6")
+
+https://github.com/dailycodework/spb-resend-email-verification-demo/blob/email-verification-with-reset-password/src/main/java/com/dailycodework/sbemailverificationdemo/registration/RegistrationController.java

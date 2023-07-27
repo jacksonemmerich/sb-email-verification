@@ -25,9 +25,8 @@ public class RegistrationCompleteEventListener implements ApplicationListener<Re
 	
 	
 	private final UserService userService;
-    private User theUser;
     private final JavaMailSender mailSender;
-    
+    private User theUser;
 	@Override
     public void onApplicationEvent(RegistrationCompleteEvent event) {
         //1. Get tho new registered user
@@ -52,7 +51,7 @@ public class RegistrationCompleteEventListener implements ApplicationListener<Re
     public void sendVerificationEmail(String url) throws MessagingException, UnsupportedEncodingException {
         String subject = "Email Verification";
         String senderName = "User Registration Portal Service";
-        String mailContent = "<p> Hi, "+ theUser.getFisrtName()+ ", </p>"+
+        String mailContent = "<p> Hi, "+ theUser.getFirstName()+ ", </p>"+
                 "<p>Thank you for registering with us,"+"" +
                 "Please, follow the link below to complete your registration.</p>"+
                 "<a href=\"" +url+ "\">Verify your email to activate your account</a>"+
