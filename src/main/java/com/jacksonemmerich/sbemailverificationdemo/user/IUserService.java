@@ -15,4 +15,11 @@ public interface IUserService {
 
     String validateToken(String verificationToken);
     VerificationToken generateNewVerificationToken(String oldToken);
+    void resetPassword(User theUser, String newPassword);
+
+    String validatePasswordResetToken(String token);
+
+    User findUserByPasswordToken(String token);
+
+    void createPasswordResetTokenForUser(User user, String passwordResetToken);
 }

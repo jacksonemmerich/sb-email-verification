@@ -2,6 +2,7 @@ package com.jacksonemmerich.sbemailverificationdemo.registration;
 
 import com.jacksonemmerich.sbemailverificationdemo.event.RegistrationCompleteEvent;
 import com.jacksonemmerich.sbemailverificationdemo.event.listener.RegistrationCompleteEventListener;
+import com.jacksonemmerich.sbemailverificationdemo.registration.password.PasswordResetRequest;
 import com.jacksonemmerich.sbemailverificationdemo.registration.token.VerificationToken;
 import com.jacksonemmerich.sbemailverificationdemo.registration.token.VerificationTokenRepository;
 import com.jacksonemmerich.sbemailverificationdemo.user.User;
@@ -14,6 +15,9 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Optional;
+import java.util.UUID;
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor

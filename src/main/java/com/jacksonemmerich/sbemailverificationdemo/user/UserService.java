@@ -2,6 +2,7 @@ package com.jacksonemmerich.sbemailverificationdemo.user;
 
 import com.jacksonemmerich.sbemailverificationdemo.exception.UserAlreadyExistsException;
 import com.jacksonemmerich.sbemailverificationdemo.registration.RegistrationRequest;
+import com.jacksonemmerich.sbemailverificationdemo.registration.password.PasswordResetTokenService;
 import com.jacksonemmerich.sbemailverificationdemo.registration.token.VerificationToken;
 import com.jacksonemmerich.sbemailverificationdemo.registration.token.VerificationTokenRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,12 +16,12 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
-public class UserService implements IUserService{
-
-    //as classes AutoWired injetadas dessa forma devem ser do tipo final e usar @RequiredArgsConstructor do Lambok
+public class UserService implements IUserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final VerificationTokenRepository tokenRepository;
+    private final PasswordResetTokenService passwordResetTokenService;
+
 
     @Override
     public List<User> getUsers() {
@@ -31,7 +32,8 @@ public class UserService implements IUserService{
     public User registerUser(RegistrationRequest request) {
         Optional<User> user = this.findByEmail(request.email());
         if (user.isPresent()){
-            throw new UserAlreadyExistsException("User with email "+ request.email() +" already exists");
+            throw new UserAlreadyExistsException(
+                    "User with email "+request.email() + " already exists");
         }
         var newUser = new User();
         newUser.setFirstName(request.fisrtName());
@@ -52,19 +54,17 @@ public class UserService implements IUserService{
         var verificationToken = new VerificationToken(token, theUser);
         tokenRepository.save(verificationToken);
     }
-
     @Override
-    public String validateToken(String verificationToken) {
-        VerificationToken token = tokenRepository.findByToken(verificationToken);
+    public String validateToken(String theToken) {
+        VerificationToken token = tokenRepository.findByToken(theToken);
         if(token == null){
             return "Invalid verification token";
         }
-
         User user = token.getUser();
         Calendar calendar = Calendar.getInstance();
-        if (token.getTokenExpirationTime().getTime() - calendar.getTime().getTime() <= 0){
-            tokenRepository.delete(token);
-            return "Token already expired";
+        if ((token.getExpirationTime().getTime()-calendar.getTime().getTime())<= 0){
+            return "Verification link already expired," +
+                    " Please, click the link below to receive a new verification link";
         }
         user.setEnabled(true);
         userRepository.save(user);
@@ -74,11 +74,29 @@ public class UserService implements IUserService{
     @Override
     public VerificationToken generateNewVerificationToken(String oldToken) {
         VerificationToken verificationToken = tokenRepository.findByToken(oldToken);
-        var tokenExpirationTime = new VerificationToken();
+        var verificationTokenTime = new VerificationToken();
         verificationToken.setToken(UUID.randomUUID().toString());
-        verificationToken.setExpirationTime(tokenExpirationTime.getTokenExpirationTime());
+        verificationToken.setExpirationTime(verificationTokenTime.getTokenExpirationTime());
         return tokenRepository.save(verificationToken);
     }
 
+    public void resetPassword(User theUser, String newPassword) {
+        theUser.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(theUser);
+    }
 
+    @Override
+    public String validatePasswordResetToken(String token) {
+        return passwordResetTokenService.validatePasswordResetToken(token);
+    }
+
+    @Override
+    public User findUserByPasswordToken(String token) {
+        return passwordResetTokenService.findUserByPasswordToken(token).get();
+    }
+
+    @Override
+    public void createPasswordResetTokenForUser(User user, String passwordResetToken) {
+        passwordResetTokenService.createPasswordResetTokenForUser(user, passwordResetToken);
+    }
 }
