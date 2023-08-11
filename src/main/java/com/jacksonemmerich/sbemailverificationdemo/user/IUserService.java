@@ -24,4 +24,6 @@ public interface IUserService {
     void createPasswordResetTokenForUser(User user, String passwordResetToken);
 
     boolean oldPasswordIsValid(User user, String oldPassword);
+
+    void resetPassword(User user, String newPassword);
 }

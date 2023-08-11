@@ -104,4 +104,10 @@ public class UserService implements IUserService {
     public boolean oldPasswordIsValid(User user, String oldPassword) {
         return passwordEncoder.matches(oldPassword, user.getPassword());
     }
+
+    @Override
+    public void resetPassword(User user, String newPassword) {
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+    }
 }
