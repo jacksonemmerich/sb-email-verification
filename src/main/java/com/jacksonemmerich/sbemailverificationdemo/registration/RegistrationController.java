@@ -2,7 +2,7 @@ package com.jacksonemmerich.sbemailverificationdemo.registration;
 
 import com.jacksonemmerich.sbemailverificationdemo.event.RegistrationCompleteEvent;
 import com.jacksonemmerich.sbemailverificationdemo.event.listener.RegistrationCompleteEventListener;
-import com.jacksonemmerich.sbemailverificationdemo.registration.password.PasswordResetRequest;
+import com.jacksonemmerich.sbemailverificationdemo.registration.password.PasswordRequestUtil;
 import com.jacksonemmerich.sbemailverificationdemo.registration.token.VerificationToken;
 import com.jacksonemmerich.sbemailverificationdemo.registration.token.VerificationTokenRepository;
 import com.jacksonemmerich.sbemailverificationdemo.user.User;
@@ -69,11 +69,11 @@ public class RegistrationController {
     }
 
     @PostMapping("/password-reset-request")
-    public String resetPasswordRequest(@RequestBody PasswordResetRequest passwordResetRequest,
+    public String resetPasswordRequest(@RequestBody PasswordRequestUtil passwordRequestUtil,
                                        final HttpServletRequest servletRequest)
             throws MessagingException, UnsupportedEncodingException {
 
-        Optional<User> user = userService.findByEmail(passwordResetRequest.getEmail());
+        Optional<User> user = userService.findByEmail(passwordRequestUtil.getEmail());
         String passwordResetUrl = "";
         if (user.isPresent()) {
             String passwordResetToken = UUID.randomUUID().toString();
@@ -91,7 +91,7 @@ public class RegistrationController {
         return url;
     }
     @PostMapping("/reset-password")
-    public String resetPassword(@RequestBody PasswordResetRequest passwordResetRequest,
+    public String resetPassword(@RequestBody PasswordRequestUtil passwordRequestUtil,
                                 @RequestParam("token") String token){
         String tokenVerificationResult = userService.validatePasswordResetToken(token);
         if (!tokenVerificationResult.equalsIgnoreCase("valid")) {
@@ -99,14 +99,24 @@ public class RegistrationController {
         }
         Optional<User> theUser = Optional.ofNullable(userService.findUserByPasswordToken(token));
         if (theUser.isPresent()) {
-            userService.resetPassword(theUser.get(), passwordResetRequest.getNewPassword());
+            userService.changePassword(theUser.get(), passwordRequestUtil.getNewPassword());
             return "Password has been reset successfully";
         }
         return "Invalid password reset token";
+    }
+    @PostMapping("/change-password")
+    public String changePassword(@RequestBody PasswordRequestUtil requestUtil){
+        User user = userService.findByEmail(requestUtil.getEmail()).get();
+        if (!userService.oldPasswordIsValid(user, requestUtil.getOldPassword())){
+            return "Incorrect old password";
+        }
+        userService.changePassword(user, requestUtil.getNewPassword());
+        return "Password changed successfully";
     }
 
     public String applicationUrl(HttpServletRequest request) {
         return "http://"+request.getServerName()+":"
                 +request.getServerPort()+request.getContextPath();
     }
+
 }

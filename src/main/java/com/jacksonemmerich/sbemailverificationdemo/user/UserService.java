@@ -80,7 +80,7 @@ public class UserService implements IUserService {
         return tokenRepository.save(verificationToken);
     }
 
-    public void resetPassword(User theUser, String newPassword) {
+    public void changePassword(User theUser, String newPassword) {
         theUser.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(theUser);
     }
@@ -98,5 +98,10 @@ public class UserService implements IUserService {
     @Override
     public void createPasswordResetTokenForUser(User user, String passwordResetToken) {
         passwordResetTokenService.createPasswordResetTokenForUser(user, passwordResetToken);
+    }
+
+    @Override
+    public boolean oldPasswordIsValid(User user, String oldPassword) {
+        return passwordEncoder.matches(oldPassword, user.getPassword());
     }
 }
